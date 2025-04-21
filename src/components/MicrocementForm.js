@@ -48,16 +48,9 @@ const MicrocementForm = () => {
     }
   };
 
-  const handleInputChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleCheckboxChange = (field, value) => {
-    const current = formData[field] || [];
-    const updated = current.includes(value)
-      ? current.filter(item => item !== value)
-      : [...current, value];
-    setFormData({ ...formData, [field]: updated });
+  const getImagePath = (label) => {
+    const slug = label.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    return `/images/mockups/${slug}.jpg`;
   };
 
   const formSteps = [
@@ -118,6 +111,18 @@ const MicrocementForm = () => {
     return !!formData[current.field];
   };
 
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleCheckboxChange = (field, value) => {
+    const currentValues = formData[field] || [];
+    const updatedValues = currentValues.includes(value)
+      ? currentValues.filter(item => item !== value)
+      : [...currentValues, value];
+    setFormData({ ...formData, [field]: updatedValues });
+  };
+
   const handleNext = () => {
     if (isLast) return setCompleted(true);
     setCurrentStep(prev => prev + 1);
@@ -173,29 +178,25 @@ const MicrocementForm = () => {
       <h3 className="mb-4 text-lg font-medium">{current.question}</h3>
 
       <div className="space-y-4">
-        {current.type === 'checkbox' && current.options.map(option => (
-          <label key={option} className="block">
-            <input
-              type="checkbox"
-              checked={formData[current.field]?.includes(option)}
-              onChange={() => handleCheckboxChange(current.field, option)}
-              className="mr-2"
-            />
-            {option}
-          </label>
-        ))}
-
-        {current.type === 'radio' && current.options.map(option => (
-          <label key={option} className="block">
-            <input
-              type="radio"
-              name={current.field}
-              checked={formData[current.field] === option}
-              onChange={() => handleInputChange(current.field, option)}
-              className="mr-2"
-            />
-            {option}
-          </label>
+        {(current.type === 'checkbox' || current.type === 'radio') && current.options.map(option => (
+          <div key={option} className="flex gap-4 items-center">
+            {current.type === 'checkbox' ? (
+              <input
+                type="checkbox"
+                checked={formData[current.field]?.includes(option)}
+                onChange={() => handleCheckboxChange(current.field, option)}
+              />
+            ) : (
+              <input
+                type="radio"
+                name={current.field}
+                checked={formData[current.field] === option}
+                onChange={() => handleInputChange(current.field, option)}
+              />
+            )}
+            <span>{option}</span>
+            <img src={getImagePath(option)} alt={option} className="h-20 object-cover rounded border" />
+          </div>
         ))}
 
         {current.type === 'number' && (
