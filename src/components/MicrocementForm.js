@@ -49,7 +49,7 @@ const MicrocementForm = () => {
   };
 
   const getImagePath = (label) => {
-    const slug = label.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return `/images/mockups/${slug}.jpg`;
   };
 
@@ -180,22 +180,23 @@ const MicrocementForm = () => {
       <div className="space-y-4">
         {(current.type === 'checkbox' || current.type === 'radio') && current.options.map(option => (
           <div key={option} className="flex gap-4 items-center">
-            {current.type === 'checkbox' ? (
-              <input
-                type="checkbox"
-                checked={formData[current.field]?.includes(option)}
-                onChange={() => handleCheckboxChange(current.field, option)}
-              />
-            ) : (
-              <input
-                type="radio"
-                name={current.field}
-                checked={formData[current.field] === option}
-                onChange={() => handleInputChange(current.field, option)}
-              />
-            )}
+            <input
+              type={current.type}
+              name={current.field}
+              checked={current.type === 'checkbox'
+                ? formData[current.field]?.includes(option)
+                : formData[current.field] === option}
+              onChange={() => current.type === 'checkbox'
+                ? handleCheckboxChange(current.field, option)
+                : handleInputChange(current.field, option)}
+            />
             <span>{option}</span>
-            <img src={getImagePath(option)} alt={option} className="h-20 object-cover rounded border" />
+            <img
+              src={getImagePath(option)}
+              alt={option}
+              className="h-20 w-32 object-cover rounded border"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
           </div>
         ))}
 
